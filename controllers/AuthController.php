@@ -14,6 +14,8 @@ class AuthController extends Controller
 {
     private const int LAST_ATTEMPT_TIMEOUT = 900;
 
+    private const int MAX_ATTEMPTS = 5;
+
     public function behaviors(): array
     {
         return [
@@ -55,8 +57,7 @@ class AuthController extends Controller
             $attempts = 0;
         }
 
-        // Если более 5 попыток за 15 минут - блокируем
-        if ($attempts >= 5) {
+        if ($attempts >= self::MAX_ATTEMPTS) {
             $waitTime = self::LAST_ATTEMPT_TIMEOUT - ($now - $lastAttempt);
             throw new TooManyRequestsHttpException("Слишком много попыток входа. Попробуйте через " . ceil($waitTime / 60) . " минут.");
         }
